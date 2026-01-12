@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>স্টেশন পাড়া দাওয়াহ্ কমিউনিটি</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/react-router-dom@7/dist/react-router-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide-react@0.562.0/dist/umd/lucide-react.min.js"></script>
+    <style>
+        body {
+            font-family: 'Hind Siliguri', 'Noto Serif Bengali', serif;
+        }
+        .font-noto {
+            font-family: 'Noto Serif Bengali', serif;
+        }
+        .line-clamp-2 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .line-clamp-3 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+        }
+        .animate-in {
+            animation: animateIn 0.3s ease-in-out;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .zoom-in {
+            animation: zoomIn 0.7s ease-in-out;
+        }
+        .slide-in-from-bottom-2 {
+            animation: slideInFromBottom 0.3s ease-out;
+        }
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes slideInFromBottom {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        const { BrowserRouter, Routes, Route, Link, useParams, useNavigate, useLocation } = ReactRouterDOM;
+        const { 
+            Target, Users, ShieldCheck, Heart, Mail, MapPin, 
+            Home as HomeIcon, BookOpen, MessageCircle, Info, Menu, X,
+            ArrowLeft, User, Calendar, Tag, Share2, Facebook, Twitter, Link as LinkIcon,
+            Search, Send, Bot, Trash2, Loader2, Sparkles, ArrowRight, Star,
+            Youtube
+        } = lucideReact;
+
+        // Constants
+        const ARTICLES = [
+            {
+                id: '1',
+                title: 'দাওয়াহ কী এবং কেন গুরুত্বপূর্ণ',
+                excerpt: 'দাওয়াহ শব্দের অর্থ হলো আল্লাহর পথে আহ্বান করা। এটি কেবল বক্তৃতা নয়, বরং চরিত্র ও আচরণের মাধ্যম।',
+                content: `দাওয়াহ শব্দের অর্থ হলো আল্লাহর পথে আহ্বান করা। এটি কেবল বক্তৃতা নয়, বরং চরিত্র, আচরণ ও সমাজসেবার মাধ্যমে ইসলামের সৌন্দর্য তুলে ধরা।
+
+দাওয়াহর গুরুত্ব:
+পবিত্র কুরআনে ইরশাদ হয়েছে— "তোমরাই শ্রেষ্ঠ উম্মত, মানবজাতির কল্যাণের জন্য তোমাদের আবির্ভাব।" এই আয়াত আমাদের দায়িত্ব স্মরণ করিয়ে দেয়। সমাজ সংস্কার ও নৈতিক উন্নয়নে দাওয়াহ অপরিহার্য।
+
+দাওয়াহর পদ্ধতি:
+১. নিজের উত্তম চরিত্র প্রদর্শন করা।
+২. হিকমত বা প্রজ্ঞার সাথে কথা বলা।
+৩. মানুষের বিপদে পাশে দাঁড়ানো।
+৪. সুন্নাহর সঠিক শিক্ষা পৌঁছে দেওয়া।`,
+                author: 'স্টেশন পাড়া দাওয়াহ্ টিম',
+                date: 'জানুয়ারি ২০২৬',
+                category: 'দাওয়াহ',
+                imageUrl: 'https://picsum.photos/seed/dawah/800/400'
+            },
+            {
+                id: '2',
+                title: 'নৈতিকতা ও সমাজ গঠন',
+                excerpt: 'ইসলাম একটি পূর্ণাঙ্গ জীবন ব্যবস্থা। সমাজের প্রতিটি স্তরে ন্যায়বিচার ও নৈতিকতা প্রতিষ্ঠা করা মুসলিমের অন্যতম কাজ।',
+                content: `ইসলাম একটি পূর্ণাঙ্গ জীবন ব্যবস্থা। সমাজের প্রতিটি স্তরে ন্যায়বিচার ও নৈতিকতা প্রতিষ্ঠা করা মুসলিমের অন্যতম কাজ। 
+
+আমাদের সমাজে নৈতিক অবক্ষয় রোধে তরুণদের ভূমিকা অত্যন্ত গুরুত্বপূর্ণ। সুশিক্ষা এবং আল্লাহভীতি ছাড়া একটি আদর্শ সমাজ গঠন অসম্ভব। 
+
+শিক্ষার উদ্দেশ্য কেবল চাকরি পাওয়া নয়, বরং একজন আদর্শ মানুষ হিসেবে গড়ে ওঠা। নবী কারীম (সা.) শিক্ষক হিসেবে আবির্ভূত হয়েছিলেন এবং তিনি সর্বোত্তম নৈতিকতার দৃষ্টান্ত স্থাপন করেছিলেন।`,
+                author: 'মাওলানা আব্দুল্লাহ',
+                date: 'ফেব্রুয়ারি ২০২৬',
+                category: 'শিক্ষা',
+                imageUrl: 'https://picsum.photos/seed/moral/800/400'
+            },
+            {
+                id: '3',
+                title: 'সমাজসেবায় ইসলামের শিক্ষা',
+                excerpt: 'অন্যের সেবা করাই ইবাদত। অসহায় ও আর্তমানবতার পাশে দাঁড়ানোই মুমিনের প্রধান বৈশিষ্ট্য।',
+                content: `মানবসেবা ইসলামের মৌলিক শিক্ষার একটি অবিচ্ছেদ্য অংশ। নবী (সা.) বলেছেন, "যে ব্যক্তি মানুষের উপকার করে সেই সর্বোত্তম মানুষ।" 
+
+স্টেশন পাড়া দাওয়াহ্ কমিউনিটি স্থানীয় দরিদ্র পরিবারগুলোর জন্য নিরলসভাবে কাজ করে যাচ্ছে। আমরা বিশ্বাস করি, দাওয়াহ কেবল মুখে নয়, হাতের কাজের মাধ্যমেও হওয়া উচিত।
+
+সেবা কার্যক্রমের মূল লক্ষ্য:
+- ক্ষুধার্তদের অন্ন দান।
+- অসুস্থদের চিকিৎসার ব্যবস্থা।
+- শিক্ষার সুযোগ বঞ্চিত শিশুদের সহযোগিতা।`,
+                author: 'টিম এডমিন',
+                date: 'মার্চ ২০২৬',
+                category: 'সমাজসেবা',
+                imageUrl: 'https://picsum.photos/seed/service/800/400'
+            }
+        ];
+
+        // Components
+        const Header = ({ toggleMenu }) => {
+            const location = useLocation();
+            const isActive = (path) => location.pathname === path;
+
+            const navLinks = [
+                { name: 'হোম', path: '/' },
+                { name: 'আর্টিকেল', path: '/articles' },
+                { name: 'এআই অ্যাসিস্ট্যান্ট', path: '/assistant' },
+                { name: 'আমাদের সম্পর্কে', path: '/about' },
+            ];
+
+            return (
+                <header className="bg-teal-700 text-white shadow-lg sticky top-0 z-40">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex items-center justify-between h-20">
+                            <div className="flex items-center gap-3">
+                                <Link to="/" className="flex items-center gap-3 hover:opacity-90 transition">
+                                    <div className="bg-white p-2 rounded-full text-teal-700 shadow-inner">
+                                        <Star size={30} fill="currentColor" />
+                                    </div>
+                                    <div>
+                                        <h1 className="text-xl md:text-2xl font-bold font-noto leading-tight">স্টেশন পাড়া দাওয়াহ্ কমিউনিটি</h1>
+                                        <p className="text-xs text-teal-100 hidden md:block">দাওয়াহ • শিক্ষা • সমাজসেবা</p>
+                                    </div>
+                                </Link>
+                            </div>
+
+                            <nav className="hidden md:flex items-center gap-8 font-medium">
+                                {navLinks.map((link) => (
+                                    <Link
+                                        key={link.path}
+                                        to={link.path}
+                                        className={`transition-colors duration-200 hover:text-teal-200 ${
+                                            isActive(link.path) ? 'text-teal-200 border-b-2 border-teal-200' : ''
+                                        }`}
+                                    >
+                                        {link.name}
+                                    </Link>
+                                ))}
+                            </nav>
+
+                            <div className="md:hidden">
+                                <button onClick={toggleMenu} className="p-2 rounded-md hover:bg-teal-800 focus:outline-none">
+                                    <Menu size={28} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            );
+        };
+
+        const Footer = () => {
+            return (
+                <footer className="bg-slate-900 text-slate-300 pt-12 pb-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                            <div>
+                                <h3 className="text-white text-xl font-bold mb-4 font-noto">স্টেশন পাড়া দাওয়াহ্</h3>
+                                <p className="text-sm leading-relaxed">
+                                    আমরা কুরআন ও সুন্নাহর আলোকে সমাজ গঠনে প্রতিশ্রুতিবদ্ধ। শিক্ষা ও দাওয়াহর মাধ্যমে একটি আদর্শ সমাজ উপহার দেওয়াই আমাদের লক্ষ্য।
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <h3 className="text-white text-xl font-bold mb-4 font-noto">দ্রুত লিঙ্ক</h3>
+                                <ul className="space-y-2 text-sm">
+                                    <li><Link to="/articles" className="hover:text-teal-400 transition">ইসলামিক আর্টিকেল</Link></li>
+                                    <li><Link to="/assistant" className="hover:text-teal-400 transition">এআই অ্যাসিস্ট্যান্ট</Link></li>
+                                    <li><Link to="/about" className="hover:text-teal-400 transition">আমাদের টিম</Link></li>
+                                    <li><a href="#" className="hover:text-teal-400 transition">সহযোগিতা করুন</a></li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 className="text-white text-xl font-bold mb-4 font-noto">যোগাযোগ</h3>
+                                <ul className="space-y-3 text-sm">
+                                    <li className="flex items-center gap-2"><MapPin size={18} className="text-teal-400" /> স্টেশন পাড়া, রেলগেট এলাকা</li>
+                                    <li className="flex items-center gap-2"><Mail size={18} className="text-teal-400" /> contact@dawahcommunity.org</li>
+                                    <li className="flex gap-4 mt-4">
+                                        <a href="#" className="p-2 bg-slate-800 rounded-full hover:bg-teal-700 transition"><Facebook size={20} /></a>
+                                        <a href="#" className="p-2 bg-slate-800 rounded-full hover:bg-teal-700 transition"><Youtube size={20} /></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-12 pt-8 border-t border-slate-800 text-center text-xs">
+                            <p className="flex items-center justify-center gap-1">
+                                © ২০২৬ | স্টেশন পাড়া দাওয়াহ্ কমিউনিটি | 
+                                <Heart size={12} className="text-red-500 fill-current" /> ভালোবাসার সাথে নির্মিত
+                            </p>
+                        </div>
+                    </div>
+                </footer>
+            );
+        };
+
+        const Home = () => {
+            const [wisdom, setWisdom] = useState('"নিশ্চয়ই কষ্টের সাথেই স্বস্তি আছে।" — আল-কুরআন');
+
+            return (
+                <div className="animate-in fade-in duration-500">
+                    <section className="relative bg-teal-800 text-white py-24 overflow-hidden">
+                        <div className="absolute inset-0 opacity-10 pointer-events-none">
+                            <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+                            <div className="absolute bottom-0 right-0 w-96 h-96 bg-teal-400 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+                        </div>
+                        
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                            <h2 className="text-4xl md:text-6xl font-extrabold mb-6 font-noto tracking-tight">
+                                ইসলামের সঠিক আলো ছড়িয়ে দিন
+                            </h2>
+                            <p className="text-lg md:text-xl text-teal-100 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+                                কুরআন ও সুন্নাহর সঠিক জ্ঞান অর্জন করুন এবং একটি সুশৃঙ্খল সমাজ গঠনে আমাদের সাথে শামিল হোন।
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                <Link 
+                                    to="/articles" 
+                                    className="px-8 py-3 bg-white text-teal-800 rounded-lg font-bold hover:bg-teal-50 transition shadow-lg flex items-center justify-center gap-2"
+                                >
+                                    আর্টিকেল পড়ুন <ArrowRight size={20} />
+                                </Link>
+                                <Link 
+                                    to="/assistant" 
+                                    className="px-8 py-3 bg-teal-600 text-white rounded-lg font-bold hover:bg-teal-700 transition border border-teal-500 shadow-lg flex items-center justify-center gap-2"
+                                >
+                                    এআই-এর সাথে আলোচনা <MessageCircle size={20} />
+                                </Link>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="max-w-4xl mx-auto -mt-10 px-4 mb-16 relative z-20">
+                        <div className="bg-white rounded-2xl p-8 shadow-xl border-l-8 border-teal-600 flex flex-col items-center text-center">
+                            <div className="bg-teal-100 p-3 rounded-full text-teal-600 mb-4 animate-pulse">
+                                <Sparkles size={24} />
+                            </div>
+                            <h3 className="text-teal-800 text-lg font-bold mb-3 font-noto">আজকের অনুপ্রেরণা</h3>
+                            <p className="text-slate-700 text-xl font-medium leading-relaxed italic">
+                                {wisdom}
+                            </p>
+                        </div>
+                    </section>
+
+                    <section className="max-w-7xl mx-auto px-4 py-12">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div className="bg-teal-50 p-8 rounded-2xl hover:bg-teal-100 transition duration-300 group">
+                                <div className="w-14 h-14 bg-teal-600 text-white flex items-center justify-center rounded-xl mb-6 shadow-md group-hover:scale-110 transition">
+                                    <BookOpen size={28} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-3 text-teal-900 font-noto">দাওয়াহ ও শিক্ষা</h3>
+                                <p className="text-slate-600 leading-relaxed">সহজ ভাষায় ইসলামের সঠিক মূলনীতিগুলো সবার কাছে পৌঁছে দেওয়া আমাদের অন্যতম প্রধান কাজ।</p>
+                            </div>
+                            <div className="bg-emerald-50 p-8 rounded-2xl hover:bg-emerald-100 transition duration-300 group">
+                                <div className="w-14 h-14 bg-emerald-600 text-white flex items-center justify-center rounded-xl mb-6 shadow-md group-hover:scale-110 transition">
+                                    <Heart size={28} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-3 text-emerald-900 font-noto">সমাজসেবা</h3>
+                                <p className="text-slate-600 leading-relaxed">স্থানীয় অসহায় ও আর্তমানবতার সেবায় আমরা নিয়মিত বিভিন্ন প্রজেক্ট পরিচালনা করি।</p>
+                            </div>
+                            <div className="bg-sky-50 p-8 rounded-2xl hover:bg-sky-100 transition duration-300 group">
+                                <div className="w-14 h-14 bg-sky-600 text-white flex items-center justify-center rounded-xl mb-6 shadow-md group-hover:scale-110 transition">
+                                    <MessageCircle size={28} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-3 text-sky-900 font-noto">কাউন্সেলিং</h3>
+                                <p className="text-slate-600 leading-relaxed">ব্যক্তিগত বা আধ্যাত্মিক যেকোনো সমস্যার সমাধানে আমরা আপনাকে সঠিক দিকনির্দেশনা দিতে প্রস্তুত।</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="bg-slate-100 py-16">
+                        <div className="max-w-7xl mx-auto px-4">
+                            <div className="flex items-center justify-between mb-10">
+                                <h2 className="text-3xl font-bold text-slate-800 font-noto">সাম্প্রতিক আর্টিকেল</h2>
+                                <Link to="/articles" className="text-teal-600 hover:text-teal-700 font-bold flex items-center gap-1">
+                                    সবগুলো দেখুন <ArrowRight size={18} />
+                                </Link>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {ARTICLES.slice(0, 3).map((article) => (
+                                    <div key={article.id} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                                        <img 
+                                            src={article.imageUrl} 
+                                            alt={article.title} 
+                                            className="h-48 w-full object-cover"
+                                        />
+                                        <div className="p-6 flex-grow flex flex-col">
+                                            <span className="inline-block px-3 py-1 bg-teal-100 text-teal-700 text-xs font-bold rounded-full mb-3 uppercase tracking-wider">
+                                                {article.category}
+                                            </span>
+                                            <h3 className="text-xl font-bold mb-3 text-slate-900 font-noto line-clamp-2">
+                                                {article.title}
+                                            </h3>
+                                            <p className="text-slate-600 text-sm mb-6 line-clamp-3 leading-relaxed">
+                                                {article.excerpt}
+                                            </p>
+                                            <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+                                                <span className="text-xs text-slate-400">{article.date}</span>
+                                                <Link 
+                                                    to={`/article/${article.id}`} 
+                                                    className="text-teal-600 text-sm font-bold hover:underline"
+                                                >
+                                                    আরও পড়ুন
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="py-20 bg-teal-900 text-white">
+                        <div className="max-w-5xl mx-auto px-4 text-center">
+                            <h2 className="text-3xl md:text-4xl font-bold mb-6 font-noto">আমাদের কমিউনিটির সাথে যুক্ত হতে চান?</h2>
+                            <p className="text-teal-200 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
+                                ইসলামিক জ্ঞান শেয়ার করা বা সেবামূলক কাজে অংশ নিতে চাইলে আজই আমাদের সাথে যোগাযোগ করুন।
+                            </p>
+                            <button className="px-10 py-4 bg-teal-500 hover:bg-teal-400 text-white rounded-full font-bold text-lg transition shadow-xl transform hover:scale-105">
+                                সদস্য হতে আবেদন করুন
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        const Articles = () => {
+            const [searchTerm, setSearchTerm] = useState('');
+
+            const filteredArticles = ARTICLES.filter(article => 
+                article.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                article.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            return (
+                <div className="py-12 bg-slate-50 min-h-screen">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h1 className="text-4xl font-extrabold text-slate-900 font-noto mb-4">ইসলামিক আর্টিকেলস</h1>
+                            <p className="text-slate-600 max-w-2xl mx-auto">
+                                ইসলামিক জীবনধারা, আকিদা, ফিকহ এবং সমসাময়িক বিষয়ে আমাদের অভিজ্ঞ লেখকদের লেখা পড়ুন।
+                            </p>
+                        </div>
+
+                        <div className="max-w-2xl mx-auto mb-16 relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                                <Search size={20} />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="আর্টিকেল খুঁজুন..."
+                                className="w-full pl-12 pr-4 py-4 bg-white rounded-2xl shadow-sm focus:ring-2 focus:ring-teal-500 focus:outline-none transition border-none"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+
+                        {filteredArticles.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {filteredArticles.map((article) => (
+                                    <div key={article.id} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col group">
+                                        <div className="relative overflow-hidden h-56">
+                                            <img 
+                                                src={article.imageUrl} 
+                                                alt={article.title} 
+                                                className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                                            />
+                                            <div className="absolute top-4 left-4">
+                                                <span className="px-3 py-1 bg-teal-600 text-white text-xs font-bold rounded-full shadow-md">
+                                                    {article.category}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="p-8 flex-grow flex flex-col">
+                                            <h3 className="text-2xl font-bold mb-4 text-slate-900 font-noto group-hover:text-teal-700 transition">
+                                                <Link to={`/article/${article.id}`}>{article.title}</Link>
+                                            </h3>
+                                            <p className="text-slate-600 text-sm mb-6 flex-grow leading-relaxed">
+                                                {article.excerpt}
+                                            </p>
+                                            <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold text-xs">
+                                                        {article.author.charAt(0)}
+                                                    </div>
+                                                    <span className="text-sm font-medium text-slate-500">{article.author}</span>
+                                                </div>
+                                                <Link 
+                                                    to={`/article/${article.id}`} 
+                                                    className="text-teal-600 font-bold hover:text-teal-800 flex items-center gap-1 transition"
+                                                >
+                                                    বিস্তারিত
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-20 bg-white rounded-3xl shadow-inner">
+                                <p className="text-xl text-slate-500 font-noto">দুঃখিত, কোনো আর্টিকেল খুঁজে পাওয়া যায়নি।</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const ArticleDetail = () => {
+            const { id } = useParams();
+            const navigate = useNavigate();
+            const article = ARTICLES.find(a => a.id === id);
+
+            if (!article) {
+                return (
+                    <div className="py-24 text-center">
+                        <h2 className="text-2xl font-bold mb-4">আর্টিকেলটি খুঁজে পাওয়া যায়নি</h2>
+                        <Link to="/articles" className="text-teal-600 font-bold hover:underline">আর্টিকেল তালিকায় ফিরে যান</Link>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="bg-slate-50 pb-20">
+                    <div className="w-full h-[400px] relative overflow-hidden">
+                        <img 
+                            src={article.imageUrl} 
+                            alt={article.title} 
+                            className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex items-end">
+                            <div className="max-w-4xl mx-auto w-full px-6 pb-12">
+                                <button 
+                                    onClick={() => navigate(-1)} 
+                                    className="mb-8 flex items-center gap-2 text-white/80 hover:text-white transition group"
+                                >
+                                    <ArrowLeft className="group-hover:-translate-x-1 transition-transform" /> ফিরে যান
+                                </button>
+                                <h1 className="text-3xl md:text-5xl font-extrabold text-white font-noto mb-6 leading-tight">
+                                    {article.title}
+                                </h1>
+                                <div className="flex flex-wrap items-center gap-6 text-white/90 text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <User size={18} className="text-teal-400" />
+                                        <span>{article.author}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Calendar size={18} className="text-teal-400" />
+                                        <span>{article.date}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Tag size={18} className="text-teal-400" />
+                                        <span className="bg-teal-600 px-2 py-0.5 rounded text-xs font-bold">{article.category}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="max-w-4xl mx-auto px-6 -mt-10 relative z-20">
+                        <div className="bg-white rounded-3xl p-8 md:p-12 shadow-2xl">
+                            <article className="prose prose-teal prose-lg max-w-none text-slate-800">
+                                <div className="whitespace-pre-line leading-relaxed font-noto">
+                                    {article.content}
+                                </div>
+                            </article>
+                            
+                            <div className="mt-16 pt-8 border-t border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                <div className="flex items-center gap-4">
+                                    <span className="font-bold text-slate-500">শেয়ার করুন:</span>
+                                    <div className="flex items-center gap-2">
+                                        <button className="p-2 bg-slate-100 hover:bg-teal-100 hover:text-teal-700 rounded-full transition"><Facebook size={20} /></button>
+                                        <button className="p-2 bg-slate-100 hover:bg-teal-100 hover:text-teal-700 rounded-full transition"><Twitter size={20} /></button>
+                                        <button className="p-2 bg-slate-100 hover:bg-teal-100 hover:text-teal-700 rounded-full transition"><LinkIcon size={20} /></button>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-slate-400 italic">
+                                    * তথ্যটি কুরআন ও সুন্নাহর ভিত্তিতে যাচাইকৃত।
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-12 bg-teal-800 rounded-3xl p-8 text-white flex flex-col md:flex-row items-center gap-8 shadow-xl">
+                            <div className="flex-grow">
+                                <h3 className="text-2xl font-bold mb-2 font-noto">আপনার কি কোনো প্রশ্ন আছে?</h3>
+                                <p className="text-teal-100 opacity-90">ইসলামিক জীবনধারা নিয়ে আপনার মনে কোনো প্রশ্ন থাকলে আমাদের এআই অ্যাসিস্ট্যান্টকে জিজ্ঞাসা করুন।</p>
+                            </div>
+                            <Link 
+                                to="/assistant" 
+                                className="whitespace-nowrap px-8 py-3 bg-white text-teal-800 rounded-full font-bold hover:bg-teal-50 transition shadow-lg"
+                            >
+                                প্রশ্ন করুন
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Assistant = () => {
+            const [messages, setMessages] = useState([]);
+            const [input, setInput] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const messagesEndRef = useRef(null);
+
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            useEffect(() => {
+                scrollToBottom();
+            }, [messages]);
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                if (!input.trim() || isLoading) return;
+
+                const userMessage = { role: 'user', text: input };
+                setMessages(prev => [...prev, userMessage]);
+                setInput('');
+                setIsLoading(true);
+
+                try {
+                    // Simulated AI response
+                    setTimeout(() => {
+                        const responses = [
+                            "আসসালামু আলাইকুম! তাকওয়া মানে আল্লাহর ভয় ও আনুগত্যের মাধ্যমে নিজেকে সুরক্ষিত করা।",
+                            "সালাত মুসলিম জীবনের স্তম্ভ। এটি আল্লাহর সাথে বান্দার যোগাযোগ, আত্মশুদ্ধির মাধ্যম এবং সমাজে শৃঙ্খলা ফিরিয়ে আনে।",
+                            "দাওয়াহর সর্বোত্তম পদ্ধতি হলো উত্তম চরিত্র প্রদর্শন। নবী (সা.)-এর জীবনই আমাদের জন্য উত্তম আদর্শ।"
+                        ];
+                        const modelMessage = { role: 'model', text: responses[Math.floor(Math.random() * responses.length)] };
+                        setMessages(prev => [...prev, modelMessage]);
+                        setIsLoading(false);
+                    }, 1000);
+                } catch (error) {
+                    console.error(error);
+                    setMessages(prev => [...prev, { role: 'model', text: "দুঃখিত, নেটওয়ার্ক সমস্যার কারণে উত্তর দিতে পারছি না।" }]);
+                    setIsLoading(false);
+                }
+            };
+
+            const clearChat = () => {
+                if (window.confirm('আপনি কি চ্যাট হিস্ট্রি মুছে ফেলতে চান?')) {
+                    setMessages([]);
+                }
+            };
+
+            return (
+                <div className="bg-slate-100 min-h-[calc(100vh-80px)] flex flex-col items-center">
+                    <div className="w-full max-w-4xl flex-grow flex flex-col bg-white shadow-2xl relative">
+                        <div className="bg-teal-700 text-white p-6 flex items-center justify-between sticky top-0 z-10 shadow-md">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-teal-500 p-2 rounded-full border-2 border-teal-400">
+                                    <Bot size={24} />
+                                </div>
+                                <div>
+                                    <h2 className="font-bold text-lg font-noto">ইসলামিক এআই অ্যাসিস্ট্যান্ট</h2>
+                                    <p className="text-xs text-teal-100 opacity-80">আপনার প্রশ্নের উত্তর দিতে প্রস্তুত</p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={clearChat}
+                                className="p-2 hover:bg-teal-600 rounded-full transition text-teal-200 hover:text-white"
+                                title="Clear Chat"
+                            >
+                                <Trash2 size={20} />
+                            </button>
+                        </div>
+
+                        <div className="flex-grow overflow-y-auto p-4 md:p-8 space-y-6 bg-slate-50 min-h-[500px]">
+                            {messages.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center h-full text-center py-20 animate-in fade-in zoom-in duration-700">
+                                    <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 max-w-md">
+                                        <Bot size={60} className="text-teal-600 mb-6 mx-auto" />
+                                        <h3 className="text-2xl font-bold text-slate-800 mb-3 font-noto">আসসালামু আলাইকুম!</h3>
+                                        <p className="text-slate-500 leading-relaxed mb-6">
+                                            আমি স্টেশন পাড়া দাওয়াহ্ কমিউনিটির এআই সহকারী। ইসলাম, নৈতিক শিক্ষা বা দাওয়াহ নিয়ে যেকোনো প্রশ্ন করতে পারেন।
+                                        </p>
+                                        <div className="grid grid-cols-1 gap-2 text-left">
+                                            <button onClick={() => setInput('তাকওয়া বলতে কী বোঝায়?')} className="text-sm p-3 bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-xl transition font-medium">"তাকওয়া বলতে কী বোঝায়?"</button>
+                                            <button onClick={() => setInput('সালাতের গুরুত্ব সংক্ষেপে বলো')} className="text-sm p-3 bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-xl transition font-medium">"সালাতের গুরুত্ব সংক্ষেপে বলো"</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                messages.map((msg, index) => (
+                                    <div 
+                                        key={index} 
+                                        className={`flex items-start gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''} animate-in slide-in-from-bottom-2 duration-300`}
+                                    >
+                                        <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${
+                                            msg.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-teal-600 text-white'
+                                        }`}>
+                                            {msg.role === 'user' ? <User size={20} /> : <Bot size={20} />}
+                                        </div>
+                                        <div className={`max-w-[85%] p-4 rounded-2xl shadow-sm leading-relaxed ${
+                                            msg.role === 'user' 
+                                                ? 'bg-indigo-600 text-white rounded-tr-none' 
+                                                : 'bg-white text-slate-800 rounded-tl-none border border-slate-100'
+                                        }`}>
+                                            <p className="font-noto text-md whitespace-pre-line">{msg.text}</p>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                            {isLoading && (
+                                <div className="flex items-start gap-3 animate-pulse">
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-teal-600 text-white flex items-center justify-center">
+                                        <Bot size={20} />
+                                    </div>
+                                    <div className="bg-white p-4 rounded-2xl rounded-tl-none border border-slate-100 shadow-sm">
+                                        <Loader2 size={24} className="animate-spin text-teal-600" />
+                                    </div>
+                                </div>
+                            )}
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        <div className="bg-amber-50 px-6 py-2 border-t border-amber-100 text-[10px] md:text-xs text-amber-700 flex items-center gap-2">
+                            <Info size={14} />
+                            <span>সতর্কতা: এআই-এর উত্তরে ভুল থাকতে পারে। জরুরি মাসআলার ক্ষেত্রে বিশেষজ্ঞ আলেমদের সাথে যোগাযোগ করুন।</span>
+                        </div>
+
+                        <div className="p-4 md:p-6 bg-white border-t border-slate-100 sticky bottom-0">
+                            <form onSubmit={handleSubmit} className="flex items-center gap-3">
+                                <input
+                                    type="text"
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    placeholder="আপনার প্রশ্নটি এখানে লিখুন..."
+                                    className="flex-grow p-4 bg-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition"
+                                    disabled={isLoading}
+                                />
+                                <button 
+                                    type="submit"
+                                    disabled={isLoading || !input.trim()}
+                                    className={`p-4 rounded-2xl transition shadow-lg flex-shrink-0 ${
+                                        isLoading || !input.trim() 
+                                            ? 'bg-slate-300 text-slate-500 cursor-not-allowed' 
+                                            : 'bg-teal-600 text-white hover:bg-teal-700 active:scale-95'
+                                    }`}
+                                >
+                                    <Send size={24} />
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const About = () => {
+            return (
+                <div className="bg-white min-h-screen">
+                    <section className="bg-slate-900 text-white py-24 text-center relative overflow-hidden">
+                        <div className="absolute inset-0 opacity-20">
+                            <img 
+                                src="https://picsum.photos/seed/community/1920/600" 
+                                alt="About Hero" 
+                                className="w-full h-full object-cover grayscale"
+                            />
+                        </div>
+                        <div className="relative z-10 max-w-4xl mx-auto px-4">
+                            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 font-noto">আমাদের লক্ষ্য ও উদ্দেশ্য</h1>
+                            <p className="text-xl text-slate-300 leading-relaxed font-light">
+                                স্টেশন পাড়া দাওয়াহ্ কমিউনিটি একটি সামাজিক ও দ্বীনি সংগঠন যা সমাজ সংস্কারে প্রতিশ্রুতিবদ্ধ।
+                            </p>
+                        </div>
+                    </section>
+
+                    <section className="py-24 max-w-7xl mx-auto px-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                            <div className="text-center">
+                                <div className="w-20 h-20 bg-teal-100 text-teal-700 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                                    <Target size={40} />
+                                </div>
+                                <h3 className="text-2xl font-bold mb-4 font-noto text-slate-800">আমাদের ভিশন</h3>
+                                <p className="text-slate-600 leading-relaxed">
+                                    একটি জ্ঞানভিত্তিক ও নৈতিকভাবে উন্নত সমাজ গঠন করা যেখানে কুরআন ও সুন্নাহর সঠিক শিক্ষা প্রাধান্য পাবে।
+                                </p>
+                            </div>
+                            <div className="text-center">
+                                <div className="w-20 h-20 bg-emerald-100 text-emerald-700 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                                    <ShieldCheck size={40} />
+                                </div>
+                                <h3 className="text-2xl font-bold mb-4 font-noto text-slate-800">বিশুদ্ধতা</h3>
+                                <p className="text-slate-600 leading-relaxed">
+                                    যেকোনো প্রকার বিদয়াত ও কুসংস্কার মুক্ত খাঁটি ইসলামী আকীদা ও আমল সবার মাঝে ছড়িয়ে দেওয়া।
+                                </p>
+                            </div>
+                            <div className="text-center">
+                                <div className="w-20 h-20 bg-rose-100 text-rose-700 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                                    <Heart size={40} />
+                                </div>
+                                <h3 className="text-2xl font-bold mb-4 font-noto text-slate-800">মানবসেবা</h3>
+                                <p className="text-slate-600 leading-relaxed">
+                                    সমাজের অসহায় মানুষের বিপদে পাশে দাঁড়ানো এবং আর্থ-সামাজিক উন্নয়নে ভূমিকা রাখা।
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="bg-slate-50 py-24 px-6">
+                        <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+                            <div className="md:w-1/2">
+                                <img 
+                                    src="https://picsum.photos/seed/dawah-team/800/1000" 
+                                    alt="Our Story" 
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            <div className="md:w-1/2 p-10 md:p-16 flex flex-col justify-center">
+                                <h2 className="text-3xl font-bold mb-6 font-noto text-teal-800">কীভাবে আমরা শুরু করলাম</h2>
+                                <p className="text-slate-600 leading-relaxed mb-6">
+                                    ২০২৪ সালে মাত্র কয়েকজন উদ্যমী তরুণের হাত ধরে আমাদের যাত্রা শুরু হয়। স্টেশন পাড়া এলাকায় মাদকের প্রকোপ ও নৈতিক অবক্ষয় দেখে আমরা সিদ্ধান্ত নিই দ্বীনি দাওয়াহর মাধ্যমে পরিবর্তনের।
+                                </p>
+                                <p className="text-slate-600 leading-relaxed">
+                                    আজ আলহামদুলিল্লাহ আমাদের সাথে কয়েক ডজন স্বেচ্ছাসেবক যুক্ত আছেন যারা দাওয়াহ, শিক্ষা ও সমাজসেবায় দিনরাত কাজ করে যাচ্ছেন।
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="py-24 max-w-7xl mx-auto px-6">
+                        <h2 className="text-4xl font-bold text-center mb-16 font-noto text-slate-800 underline underline-offset-8 decoration-teal-500">আমাদের টিম</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                            {[
+                                { name: 'আবু বকর', role: 'সংস্থাপক ও পরিচালক' },
+                                { name: 'ওমর ফারুক', role: 'শিক্ষা বিভাগ' },
+                                { name: 'উসমান গণি', role: 'সমাজসেবা বিভাগ' },
+                                { name: 'আলী আহমদ', role: 'আইটি ও মিডিয়া' }
+                            ].map((member, idx) => (
+                                <div key={idx} className="text-center group">
+                                    <div className="w-32 h-32 md:w-48 md:h-48 mx-auto bg-slate-200 rounded-full mb-6 overflow-hidden border-4 border-white shadow-lg transition group-hover:border-teal-400">
+                                        <img src={`https://picsum.photos/seed/member${idx}/300/300`} alt={member.name} className="w-full h-full object-cover" />
+                                    </div>
+                                    <h4 className="text-xl font-bold font-noto">{member.name}</h4>
+                                    <p className="text-teal-600 font-medium text-sm">{member.role}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    <section className="bg-teal-50 py-24 px-6 border-t border-teal-100">
+                        <div className="max-w-4xl mx-auto text-center">
+                            <h2 className="text-3xl font-bold mb-10 font-noto text-teal-900">যোগাযোগের ঠিকানা</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="bg-white p-8 rounded-2xl shadow-sm border border-teal-100 flex flex-col items-center">
+                                    <MapPin size={32} className="text-teal-600 mb-4" />
+                                    <h5 className="font-bold text-lg mb-2">ঠিকানা</h5>
+                                    <p className="text-slate-600">স্টেশন পাড়া, মেইন রোড সংলগ্ন, ঢাকা</p>
+                                </div>
+                                <div className="bg-white p-8 rounded-2xl shadow-sm border border-teal-100 flex flex-col items-center">
+                                    <Mail size={32} className="text-teal-600 mb-4" />
+                                    <h5 className="font-bold text-lg mb-2">ইমেইল</h5>
+                                    <p className="text-slate-600">info@stationparadawah.com</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+            const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+            return (
+                <BrowserRouter>
+                    <div className="min-h-screen flex flex-col">
+                        <Header toggleMenu={toggleMenu} />
+                        
+                        {isMenuOpen && (
+                            <div className="fixed inset-0 z-50 bg-teal-900/95 flex flex-col items-center justify-center space-y-8 text-white">
+                                <button onClick={toggleMenu} className="absolute top-6 right-6 p-2">
+                                    <X size={32} />
+                                </button>
+                                <Link to="/" onClick={toggleMenu} className="text-2xl font-semibold flex items-center gap-2">
+                                    <HomeIcon /> হোম
+                                </Link>
+                                <Link to="/articles" onClick={toggleMenu} className="text-2xl font-semibold flex items-center gap-2">
+                                    <BookOpen /> আর্টিকেল
+                                </Link>
+                                <Link to="/assistant" onClick={toggleMenu} className="text-2xl font-semibold flex items-center gap-2">
+                                    <MessageCircle /> এআই অ্যাসিস্ট্যান্ট
+                                </Link>
+                                <Link to="/about" onClick={toggleMenu} className="text-2xl font-semibold flex items-center gap-2">
+                                    <Info /> আমাদের সম্পর্কে
+                                </Link>
+                            </div>
+                        )}
+
+                        <main className="flex-grow">
+                            <Routes>
+                                <Route path="/" element={<Home />} />
+                                <Route path="/articles" element={<Articles />} />
+                                <Route path="/article/:id" element={<ArticleDetail />} />
+                                <Route path="/assistant" element={<Assistant />} />
+                                <Route path="/about" element={<About />} />
+                            </Routes>
+                        </main>
+
+                        <Footer />
+                    </div>
+                </BrowserRouter>
+            );
+        };
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
